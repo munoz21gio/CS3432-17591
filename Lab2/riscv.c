@@ -92,23 +92,18 @@ bool interpret(char* instr){
 	}
 	else if(compare_strings(riscv_instr[0], "LW")==1){			//interpreting LW instruction
 		//lw syntax: LW RD IMM RS1 (LEFT TO RIGHT)
-		free(riscv_instr);
-		riscv_instr = tokenize(instr);
-		char* index;
-		int indices[3];
+		int rd;
+		int imm;
+		int rs1;
 		
-		index = riscv_instr[1];					
-		index++;
-		indices[0] = atoi(index);								//rd index
-		index = riscv_instr[2];			
-		indices[1] = atoi(index);								//imm index
-		index = riscv_instr[3];
-		index++;
-		indices[2] = atoi(index);								//rs1 index
-		
+		riscv_instr[1]++;
+		riscv_instr[3]++;
+		rd = atoi(riscv_instr[1]);
+		imm = atoi(riscv_instr[2]);
+		rs1 = atoi(riscv_instr[3]);	
+		printf("rd: %d, imm: %d, rs1: %d\n", rd, imm, rs1);
 		//rd = memory[rs1 + imm]
-		reg[indices[0]] = read_address(indices[2] + indices[1], "mem.txt");
-		//free(riscv_instr);
+		//reg[rd]] = read_address(reg[rs1] + imm, "mem.txt");
 		return true;
 	}
 	else if(compare_strings(riscv_instr[0], "SW")==1){
@@ -129,7 +124,6 @@ bool interpret(char* instr){
 
 		//memory[rs1 + imm] = rd
 		write_address(reg[indices[0]],indices[1] + indices[2], "mem.txt");
-		//free(riscv_instr);
 		return true;
 	}
 	printf("Instruction is not valid. Type the instruction using uppercase letters and using a space as a delimeter.");
@@ -152,7 +146,7 @@ void write_read_demo(){
 	// Write 4095 (or "0000000 00000FFF") in the 20th address (address 152 == 0x98)
 	int32_t write = write_address(data_to_write, address, mem_file);
 	if(write == (int32_t) NULL)
-		printf("ERROR: Unsucessful write to address %0X\n", 0x40);
+		printf("ERROR: Unsucessful write to address %0X\n", address);
 	int32_t read = read_address(address, mem_file);
 
 	printf("Read address %lu (0x%lX): %lu (0x%lX)\n", address, address, read, read); // %lu -> format as an long-unsigned
@@ -180,7 +174,7 @@ int main(){
 	print_regs();
 
 	// Below is a sample program to a write-read. Overwrite this with your own code.
-	//write_read_demo();
+	write_read_demo();
 
 	printf(" RV32 Interpreter.\nType RV32 instructions. Use upper-case letters and space as a delimiter.\nEnter 'EOF' character to end program\n");
 
@@ -189,12 +183,18 @@ int main(){
 	// fgets() returns null if EOF is reached.
 	is_null = fgets(instruction, 1000, stdin) == NULL;
 	while(!is_null){
-		interpret(instruction);
+	/*	interpret(instruction);
 		printf("\n");
 		print_regs();
 		printf("\n");
 
 		is_null = fgets(instruction, 1000, stdin) == NULL;
+	*/
+		write_read_demo();
+		char** tokens = tokenize(instruction);
+		print_all_tokens(tokens);
+		is_null = fgets(instruction, 1000, stdin) == NULL;
+
 	}
 
 	printf("Good bye!\n");

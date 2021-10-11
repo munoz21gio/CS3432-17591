@@ -75,7 +75,7 @@ char *copy_str(char *inStr, short len){
    //copy elements of the word into an char array pointer
    char * word = (char *)malloc(len+1 *sizeof(char*));      //allocating memory space for my array
    for(int i = 0; i < len; i++) {
-      word[i] += inStr[i];
+      word[i] = inStr[i];
       //printf("%d ",i); 
    }
    return word;
@@ -83,16 +83,18 @@ char *copy_str(char *inStr, short len){
 }
 
 char** tokenize(char* str){
-   char ** tokens = (char**)malloc(count_tokens(str)*sizeof(char**)+1);
+   char ** tokens = (char*)malloc((count_tokens(str)+1)*sizeof(char*));
    char * start = word_start(str);
    char * end = end_word(str);
-   for(int i = 0; i < count_tokens(str); i++){
+  int i = 0;
+ for(i=0; i < count_tokens(str); i++){
       tokens[i] = copy_str(start, end - start);
       start = word_start(end);
       end = end_word(start);
       //printf("%d\t", i);    //checking if the array indeed has a zero-terminated string at the end
-   }
-   return tokens;
+  }
+	tokens[i] = NULL;
+ return tokens;
 
 }
 
